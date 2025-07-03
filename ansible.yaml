@@ -1,0 +1,193 @@
+---common ansible commands usage----
+create 3 instances - ansible-controller , ansible node1 , ansible node2 -> connect , set hostname 
+put the entry of ip and hostname in /etc/hosts file
+generate ssh key on controller and copy it under authorized keys in node1 and node 2
+install anisble only on controller
+#cd /etc/ansible
+#vim hosts
+[dev-servers]
+worker1-server
+[prod-server]
+worker2-server
+*ping command :- ansible all -m ping
+*ping with desired output :- ansible all -m ping -a data=hello
+*to add user :- ansible all -m user -a 'name=mansi uid=1200 home=/ltimindtree state=present'
+check in target machine using :- cat /etc/passwd | grep -i mansi
+to create a file :- ansible all -m file -a 'path=/tmp/mansi.txt state=touch'
+to create a directory :- ansible all -m file -a 'path=/tmp/mydirectory state=directory' 
+to pull something from the target to controller:- ansible worker1-server -m fetch -a 'src=/tmp/mansi.txt dest=/mnt'
+to copy:- ansible all -m copy -a 'src=/etc/fstab dest=/tmp'
+to see disk info :- ansible all -m command -a 'df -hT'
+to see partition info :- ansible all -m command -a 'fdisk -l'
+
+----working with playbook-----------
+#cd /etc/ansible
+#mkdir project-x
+vim sample-playbook.yaml
+---
+- name: this is sample playbook
+  hosts: all
+  tasks:
+    - name: creating user
+      user:
+        name: sachin
+        uid: 1300
+        home: /heros
+        shell: /bin/bash
+        state: present
+    - name: installing apache
+      yum:
+        name: httpd
+        state: present
+    - name: install cifs
+      yum:
+        name: cifs-utils
+        state: present
+    - name: install vsftpd
+      dnf:
+        name: vsftpd
+        state: latest
+...
+# ansible-playbook sample-playbook.yaml --syntax-check
+#ansible-playbook sample-playbook.yaml -C
+#ansible-playbook sample-playbook.yaml
+verification on target
+rpmquery httpd
+   31  rpmquery vsftpd
+   32  rpmquery cifs-utils
+   33  cat /etc/passwd | grep -i sachin
+
+----configuring basic apache server ---------
+create 3 instances 
+and provide connection between it by making the entry of hostname and ip in /etc/hosts file
+generate ssh key and copy to the target machine under authorized keys
+install ansible on controller machine
+make the entry in /etc/ansible
+[dev-servers]
+ansible-target
+[prod-servers]
+ansible-target2
+#cd /etc/ansible 
+#vim basic-apache.yaml
+---
+- name: configure basic apache
+  hosts: all
+  tasks:
+    - name: installed httpd
+      dnf:
+        name: httpd
+        state: latest
+    - name: copied index.html
+      copy:
+        src: index.html
+        dest: /var/www/html/index.html
+    - name: started httpd
+      systemd:
+        name: httpd
+        state: started
+        enabled: true
+ #ansible-playbook basic-apache.yaml -C
+ #ansible-playbook basic-apache.yaml
+verify in target machines
+
+-----------handler section------------------------------------
+remove the httpd package if installed on the 3 machines
+install on controll machine
+ yum install httpd -y
+   48  cd /etc/httpd/conf
+   49  cp httpd.conf /etc/ansible/project-x
+   50  cd
+make a project-x directory in ansible 
+#cd /etc/httpd/conf
+#cp httpd.conf /etc/ansible/project-x
+#cd
+make changes in the httpd.conf file
+#vim hanlders.yaml
+---
+- name: using handlers with apache
+  hosts: ansible-target
+  tasks:
+
+    - name: installed httpd
+      dnf:
+        name: httpd
+        state: latest
+
+    - name: copied httpd.conf file
+      copy:
+        src: httpd.conf
+        dest: /etc/httpd/conf/httpd.conf
+      notify: restart_httpd
+
+    - name: copied index.html
+      copy:
+        src: index.html
+        dest: /var/www/html/index.html
+
+    - name: started httpd
+      systemd:
+        name: httpd
+        state: started
+        enabled: true
+
+    - name: installed firewalld
+      dnf:
+        name: firewalld
+        state: present
+    - name: started firewalld
+      systemd:
+        name: firewalld
+        state: started
+    - name: add port 81 in firewall
+      firewalld:
+        port: 81/tcp
+        permanent: yes
+        state: enabled
+        immediate: true
+  handlers:
+    - name: restart_httpd
+      service:
+        name: httpd
+        state: restarted
+
+--------ec2 provisioning via ansible-----------------
+create an instance
+#sudo su -
+#yum install ansible* -y
+#mkdir -p /etc/ansible
+#cd /etc/ansible
+#vim ansible.cfg
+#ansible-galaxy collection install amazon.aws
+#cd
+#yum install python* --allowerasing --skip-broken
+#yum install awscli --user --upgrade
+#pip install boto
+#dig google.com
+#cd /etc/ansible
+#ll
+#vim hosts
+[localhost]
+localhost
+#ssh-keygen
+#aws configure
+ #passwd root
+ #vim /etc/ssh/sshd_config
+ #systemctl restart sshd
+  #systemctl enable sshd
+  #cd .ssh/
+  #ssh-copy-id root@localhost
+  #cd
+  #cd /etc/ansible
+  #vim ec2.yaml
+#pip install botocore
+#vim hosts
+[localhost]
+localhost
+localhost ansible_connection=local ansible_python_interpreter=/usr/bin/python3 
+
+#ansible-playbook ec2.yaml --syntax-check
+#ansible-playbook ec2.yaml -C
+#ansible-playbook ec2.yaml 
+
+---------------------eks cluster provisionin------------------------------------------
+

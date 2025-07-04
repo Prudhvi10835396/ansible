@@ -1,0 +1,80 @@
+yum install docker*
+
+systemctl restart docker
+
+systemctl enable docker
+
+docker images
+
+docker ps -a
+
+docker pull ubuntu
+
+docker images
+
+docker volume create volume_doc
+
+cd /var/lib/
+
+ll
+
+cd docker
+
+ll
+
+cd volumes
+
+ll
+
+cd
+
+docker run -it --name jas_con -v volume_doc:/app/data ubuntu
+
+  Go inside the container
+
+apt-get update -y
+
+apt install apache2
+
+cd /var/www/html
+
+ll
+
+echo 'Hi this is my container' > index.html
+
+cd
+
+cd /app/data
+
+ll
+
+touch jas.txt{1..5}
+
+ll
+
+cd
+
+cd /var/www/html
+
+ll
+
+cat index.html
+
+service apache2 start
+
+  type ctrl p + ctrl q to come out of container.
+
+curl service_ip
+
+cd /var/lib/docker/volumes
+
+  ll
+
+cd volume_doc
+
+ll
+
+cd _data
+
+ll
+ 

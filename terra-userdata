@@ -1,0 +1,43 @@
+resource "aws_instance" "web" {
+  ami           = "ami-05ffe3c48a9991133"
+  instance_type = "t2.micro"
+  key_name = "terra-key"
+  vpc_security_group_ids = [aws_security_group.test_access.id]
+  availability_zone = "us-east-1a"
+  tags = {
+    Name = "hey-server"
+  }
+user_data = <<-EOF
+        #!/bin/bash
+        sudo yum install httpd -y
+        sudo systemctl start httpd
+        sudo systemctl enable httpd
+        echo "<h1>custom  webserver using terraform</h1>" | sudo tee /var/www/html/index.html
+  EOF
+}
+
+resource "aws_security_group" "test_access" {
+  name        = "test_access"
+  description = "allow ssh and http"
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+ }
+}

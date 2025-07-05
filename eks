@@ -1,0 +1,88 @@
+    1 apt-get update -y
+    2  yum update -y
+    3  yum install unzip -y
+    4  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    5   unzip awscliv2.zip
+    6   sudo ./aws/install
+    7  aws configure
+    8  curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+    9  sudo mv /tmp/eksctl /usr/local/bin
+   10  curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+   11  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+   12   kubectl version --client
+   13  ssh-keygen
+   14  cat  /root/.ssh/id_rsa.pub
+   15 eksctl create cluster --name test-cluster --region us-east-1 --version 1.32 --vpc-public-subnets subnet-0e30f2b177d543f56,subnet-08b1a1b1f20d23ffd --without-nodegroup
+   16  kubectl get nodes
+   17 eksctl create nodegroup \
+  --cluster my-cluster \
+  --region us-east-2 \
+  --name my-node-group \
+  --node-ami-family Ubuntu2204 \
+  --node-type t2.small \
+  --subnet-ids subnet-086ced1a84c94a342,subnet-01695faa5e0e61d97 \
+  --nodes 3 \
+  --nodes-min 2 \
+  --nodes-max 4 \
+  --ssh-access \
+  --ssh-public-key /root/.ssh/id_rsa.pub
+  18  kubectl label node node-one.example.com node-role.kubernetes.io/worker=worker
+  19 mkdir project-x
+  20  cd project-x
+  21  vim pod.yaml
+  22  kubectl apply -f pod.yaml
+   23 kubectl get pods
+     24 vim deployment.yaml
+     25 kubectl apply -f deployment.yaml
+     26 kubectl get pods
+     27 kubectl get deployment
+     28 vim service.yaml
+     29 kubectl apply -f service.yaml
+    30 kubectl get all
+###########################################################################
+pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+spec:
+  containers:
+  - name: nginx
+    image: nginx:1.14.2
+    ports:
+    - containerPort: 80
+deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.14.2
+        ports:
+        - containerPort: 80
+service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80

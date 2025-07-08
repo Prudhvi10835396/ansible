@@ -1,0 +1,36 @@
+yum install ansible
+ssh-keygen
+cd .ssh/
+vim authorized_keys ( if you are creating only with local host then paste the local hosts ssh as well)
+ansible-galaxy collection install amazon.aws
+#cd
+yum install python* --allowerasing --skip-broken
+pip install boto
+pip install botocore
+dig google.com
+cd /etc/ansible
+ll
+vim hosts
+[localhost]
+localhost
+localhost ansible_connection=local ansible_python_interpreter=/usr/bin/python3 
+cd /etc/ansible
+  #vim ec2.yaml
+---
+- hosts:  localhost
+tasks:
+    - name: creating Ec2 instance via Ansible
+      amazon.aws.ec2_instance:
+        aws_access_key: access_key
+        aws_secret_key: secret_key
+        name: K8s-Master
+        instance_type: t2.medium
+        image_id: ami-0a7d80731ae1b2435
+        vpc_subnet_id: subnet-0252c2e12558d5909
+        key_name: key
+        region: us-east-1
+        count: 1
+        state: present
+#ansible-playbook ec2.yaml --syntax-check
+#ansible-playbook ec2.yaml -C
+#ansible-playbook ec2.yaml 

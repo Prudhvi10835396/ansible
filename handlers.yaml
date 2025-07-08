@@ -1,0 +1,43 @@
+- name: using handlers with apache
+  hosts: all
+  tasks:
+
+    - name: installed httpd
+      dnf:
+        name: httpd
+        state: latest
+    - name: copied httpd.conf file
+      copy:
+        src: httpd.conf
+        dest: /etc/httpd/conf/httpd.conf
+      notify: restart_httpd
+    - name: copied index.html
+      copy:
+        src: index.html
+        dest: /var/www/html/index.html
+
+    - name: started httpd
+      systemd:
+        name: httpd
+        state: started
+        enabled: true
+
+    - name: installed firewalld
+      dnf:
+        name: firewalld
+        state: present
+    - name: started firewalld
+      systemd:
+        name: firewalld
+        state: started
+    - name: add port 81 in firewall
+      firewalld:
+        port: 81/tcp
+        permanent: yes
+        state: enabled
+        immediate: true
+  handlers:
+    - name: restart_httpd
+      service:
+        name: httpd
+        state: restarted

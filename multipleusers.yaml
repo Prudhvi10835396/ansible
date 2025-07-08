@@ -1,0 +1,19 @@
+---
+- name: Create a group
+  hosts: all
+  become: true
+  tasks:
+    - name: Create the 'developers' group
+      ansible.builtin.group:
+        name: developers
+        state: present
+
+    - name: Add users to the 'developers' group
+      ansible.builtin.user:
+        name: "{{ item }}"
+        groups: developers
+        append: yes
+      loop:
+        - usko
+        - fred
+        - hyman

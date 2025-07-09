@@ -1,3 +1,29 @@
+    ip a s
+    2  vim /etc/hosts
+    3  ssh-keygen
+    4  cat /root/.ssh/id_rsa.pub
+    5  cd .ssh/
+    6  vim authorized_keys
+    7  systemctl restart ssh
+    8  systemctl restart sshd
+    9  systemctl enable sshd
+   10  cd
+   11  yum install ansible
+   cd /etc/ansible
+   vim hosts
+   mkdir new
+   cd new
+   cd
+   mv /etc/fstab /etc/ansible/new
+    cd /etc/ansible
+   25  ll
+   26  cd new
+   27  ll
+   28  vim index.html
+   29  vim test.yaml
+   30  ansible-playbook test.yaml --syntax-check
+   ansible-playbook test.yaml -C
+   ansible-playbook test.yaml
 - name: this is sample playbook
   hosts: all
   tasks:

@@ -1,4 +1,5 @@
 yum install ansible
+yum install python* --allowerasing --skip-broken
 ssh-keygen
 cd .ssh/
 vim authorized_keys ( if you are creating only with local host then paste the local hosts ssh as well)
@@ -7,7 +8,6 @@ systemctl restart sshd
 systemctl enable sshd
 ansible-galaxy collection install amazon.aws
 #cd
-yum install python* --allowerasing --skip-broken
 pip install boto
 pip install botocore
 dig google.com

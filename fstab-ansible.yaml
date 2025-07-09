@@ -1,0 +1,20 @@
+- name: this is sample playbook
+  hosts: all
+  tasks:
+    - name: installing apache
+      yum:
+        name: httpd
+        state: present
+    - name: copied index.html
+      copy:
+        src: index.html
+        dest: /var/www/html/index.html
+    - name: started httpd
+      systemd:
+        name: httpd
+        state: started
+        enabled: true
+    - name: copied fstab file
+      copy:
+        src: fstab
+        dest: /tmp/fstab

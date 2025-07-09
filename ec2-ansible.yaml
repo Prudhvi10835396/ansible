@@ -6,14 +6,14 @@ vim authorized_keys ( if you are creating only with local host then paste the lo
 vim /etc/ssh/sshd_config
 systemctl restart sshd
 systemctl enable sshd
+cd /etc/ansible
+ll
+vim hosts
 ansible-galaxy collection install amazon.aws
 #cd
 pip install boto
 pip install botocore
 dig google.com
-cd /etc/ansible
-ll
-vim hosts
 [localhost]
 localhost
 localhost ansible_connection=local ansible_python_interpreter=/usr/bin/python3 
